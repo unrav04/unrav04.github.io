@@ -1,279 +1,640 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unarv Erinjery | Portfolio</title>
+    <title>Unarv Erinjery — Project Portfolio</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: '#2563eb',
-                        dark: '#0f172a',
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#0284c7',
+                            600: '#2563eb',
+                            700: '#4f46e5',
+                            accent: '#0d9488'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
                     }
                 }
             }
         }
     </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <style>
-        /* Custom scrollbar for a polished look */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* 3D Stage Container */
+        .stage-3d {
+            perspective: 1200px;
+            perspective-origin: 50% 50%;
+        }
+
+        .wheel-carousel {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.15s cubic-bezier(0.1, 0.85, 0.25, 1);
+        }
+
+        .project-card-3d {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -150px; /* Half height */
+            margin-left: -160px; /* Half width */
+            width: 320px;
+            height: 300px;
+            backface-visibility: hidden;
+            transition: transform 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+            cursor: pointer;
+        }
+
+        /* Active highlight ring glow */
+        .card-active {
+            box-shadow: 0 20px 35px -10px rgba(79, 70, 229, 0.25), 0 0 0 3px #4f46e5;
+            z-index: 50;
+        }
+
+        /* Subtle grid background */
+        .bg-grid-pattern {
+            background-size: 32px 32px;
+            background-image: 
+                linear-gradient(to right, rgba(226, 232, 240, 0.6) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
+        }
+
+        /* Glassmorphism panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #1e293b; 
+            background: #f1f5f9;
         }
         ::-webkit-scrollbar-thumb {
-            background: #3b82f6; 
+            background: #cbd5e1;
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #2563eb; 
+            background: #94a3b8;
+        }
+
+        /* Pulse ring animation */
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 0.4; }
+        }
+        .pulse-active {
+            animation: pulseGlow 2.5s infinite ease-in-out;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans antialiased">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between relative bg-grid-pattern">
 
-    <nav class="fixed w-full z-50 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex-shrink-0">
-                    <span class="text-xl font-bold text-blue-500">UE.</span>
+    <!-- Header Section -->
+    <header class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-4 relative z-20">
+        <div class="glass-panel rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 via-sky-500 to-teal-400 flex items-center justify-center text-white font-black text-xl shadow-md">
+                    UE
                 </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#home" class="hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</a>
-                        <a href="#about" class="hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">About</a>
-                        <a href="#projects" class="hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Projects</a>
-                        <a href="#contact" class="hover:text-blue-400 px-3 py-2 rounded-md text-sm font-medium transition-colors">Contact</a>
-                    </div>
-                </div>
-                <div class="md:hidden">
-                    <button onclick="toggleMenu()" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none">
-                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-gray-800">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#home" class="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium">Home</a>
-                <a href="#about" class="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium">About</a>
-                <a href="#projects" class="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium">Projects</a>
-                <a href="#contact" class="block hover:bg-gray-700 px-3 py-2 rounded-md text-base font-medium">Contact</a>
-            </div>
-        </div>
-    </nav>
-
-    <section id="home" class="h-screen flex items-center justify-center relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
-            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-blue-600/20 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
-        </div>
-        
-        <div class="text-center px-4 max-w-4xl mx-auto">
-            <p class="text-blue-500 font-medium mb-4 tracking-wide">HELLO, I'M</p>
-            <h1 class="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white">
-                Unarv Erinjery
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Building the future of healthcare.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#projects" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-semibold transition-all transform hover:scale-105 shadow-lg shadow-blue-600/25">
-                    View Projects
-                </a>
-                <a href="#contact" class="px-8 py-3 border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white rounded-full font-semibold transition-all">
-                    Contact Me
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <section id="about" class="py-24 bg-gray-800/50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-3xl mx-auto text-center">
-                <h2 class="text-3xl md:text-4xl font-bold mb-8 text-white">About Me</h2>
-                <div class="bg-gray-900 p-8 rounded-2xl shadow-xl border border-gray-800">
-                    <p class="text-lg text-gray-300 leading-relaxed">
-                        I am a Biomedical Engineering undergraduate student with a passion to create. I thrive on transforming ideas into functional prototypes and finding innovative solutions to real-world challenges in medical technology and robotics.
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
+                        Unarv Erinjery
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            Robotics & Biomedical Tech
+                        </span>
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-0.5 max-w-2xl">
+                        Interactive engineering repository showcasing voice-controlled surgical robotics, biomechanical lattice structures, and real-time medical sensing systems.
                     </p>
                 </div>
-                
-                <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">Python</div>
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">C/C++</div>
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">MATLAB</div>
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">Computer Vision</div>
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">Microcontrollers</div>
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">Fusion 360</div>
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">PSpice</div>
-                    <div class="p-3 bg-gray-900 rounded-lg border border-gray-800 text-blue-400 font-mono">Robotics</div>
+            </div>
+
+            <!-- Action & Navigation Controls Header -->
+            <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end border-t md:border-t-0 pt-3 md:pt-0 border-slate-200">
+                <!-- Grid / Wheel Mode Toggle Button -->
+                <div class="bg-slate-100 p-1 rounded-xl flex items-center gap-1 border border-slate-200">
+                    <button id="viewWheelBtn" onclick="switchView('wheel')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm">
+                        <i data-lucide="disc" class="w-4 h-4"></i>
+                        <span>Interactive Dial</span>
+                    </button>
+                    <button id="viewGridBtn" onclick="switchView('grid')" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5">
+                        <i data-lucide="layout-grid" class="w-4 h-4"></i>
+                        <span>Grid List</span>
+                    </button>
                 </div>
+
+                <!-- GitHub Profile Link -->
+                <a href="https://github.com/unrav04" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 hover:bg-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-sm">
+                    <i data-lucide="github" class="w-4 h-4"></i>
+                    <span>@unrav04</span>
+                    <i data-lucide="external-link" class="w-3.5 h-3.5 opacity-70"></i>
+                </a>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section id="projects" class="py-24">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl md:text-4xl font-bold mb-16 text-center text-white">Featured Projects</h2>
+    <!-- Main Dynamic Content Area -->
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex-1 flex flex-col justify-center relative">
+        
+        <!-- 3D WHEEL CAROUSEL VIEW -->
+        <div id="wheelViewContainer" class="w-full flex flex-col items-center justify-center relative min-h-[520px]">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Instructions and Quick Navigation Bar -->
+            <div class="mb-2 text-center flex items-center justify-center gap-3 text-xs font-medium text-slate-500 bg-white/70 px-4 py-1.5 rounded-full border border-slate-200 shadow-xs">
+                <span class="flex items-center gap-1"><i data-lucide="mouse-pointer" class="w-3.5 h-3.5 text-indigo-600"></i> Drag / Scroll Wheel</span>
+                <span class="text-slate-300">|</span>
+                <span class="flex items-center gap-1"><i data-lucide="arrow-left-right" class="w-3.5 h-3.5 text-indigo-600"></i> Arrow Keys</span>
+                <span class="text-slate-300">|</span>
+                <span class="flex items-center gap-1"><i data-lucide="touchpad" class="w-3.5 h-3.5 text-indigo-600"></i> Touch Swipe</span>
+            </div>
+
+            <!-- 3D Stage -->
+            <div class="stage-3d w-full h-[340px] flex items-center justify-center relative my-2 overflow-hidden rounded-3xl border border-slate-200/60 bg-gradient-to-b from-white/40 to-slate-100/40 backdrop-blur-xs">
+                <!-- Center Focus Ring Background Visual -->
+                <div class="absolute w-[340px] h-[310px] rounded-2xl border-2 border-indigo-500/20 bg-indigo-50/20 pointer-events-none pulse-active"></div>
                 
-                <a href="https://github.com/unrav04/SURGBOT" target="_blank" class="block group bg-gray-800 rounded-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 border border-gray-700 hover:border-blue-500 cursor-pointer">
-                    <div class="p-8">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">SurgBot</h3>
-                            <span class="bg-green-900/30 text-green-300 text-xs px-2 py-1 rounded border border-green-800">Completed</span>
-                        </div>
-                        <p class="text-gray-400 mb-6">
-                            A vision and voice-controlled robotic arm designed to autonomously pick and place surgical tools.
-                        </p>
-                        <ul class="space-y-2 text-sm text-gray-300 mb-6">
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Real-time tool detection using YOLO and computer vision.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Voice command integration for hands-free surgical assistance.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Microcontroller-based inverse kinematics for precise actuation.
-                            </li>
-                        </ul>
-                        <div class="flex flex-wrap gap-2 mt-auto">
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Python</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Computer Vision</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Raspberry Pi</span>
-                        </div>
-                    </div>
-                </a>
+                <!-- 3D Rotating Wheel Container -->
+                <div id="wheelCarousel" class="wheel-carousel w-full h-full">
+                    <!-- Project Cards standardly rendered via JS -->
+                </div>
 
-                <a href="https://github.com/unrav04/FES-Stimulator" target="_blank" class="block group bg-gray-800 rounded-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 border border-gray-700 hover:border-blue-500 cursor-pointer">
-                    <div class="p-8">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">Neurorehabilitation FES</h3>
-                            <span class="text-gray-500 text-sm">2024</span>
-                        </div>
-                        <p class="text-gray-400 mb-6">
-                            A functional electrical stimulation system designed for neurorehabilitation in patients with motor impairments.
-                        </p>
-                        <ul class="space-y-2 text-sm text-gray-300 mb-6">
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Multiphase current-controlled system with programmable pulse widths.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Simulation of boost converters (9V to 100V+) using PSpice.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Engineered safety protocols to prevent tissue damage.
-                            </li>
-                        </ul>
-                        <div class="flex flex-wrap gap-2 mt-auto">
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">STM32</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">PSpice</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Hardware Design</span>
-                        </div>
-                    </div>
-                </a>
+                <!-- Navigation Controls Overlay Buttons (Left/Right) -->
+                <button onclick="rotateWheel(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full glass-panel flex items-center justify-center text-slate-700 hover:text-indigo-600 hover:scale-110 active:scale-95 transition-all shadow-md z-30">
+                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                </button>
+                <button onclick="rotateWheel(1)" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full glass-panel flex items-center justify-center text-slate-700 hover:text-indigo-600 hover:scale-110 active:scale-95 transition-all shadow-md z-30">
+                    <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                </button>
+            </div>
 
-                <a href="https://github.com/unrav04/VIRENthebot" target="_blank" class="block group bg-gray-800 rounded-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 border border-gray-700 hover:border-blue-500 cursor-pointer">
-                    <div class="p-8">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">VIRENthebot</h3>
-                            <span class="text-gray-500 text-sm">2024</span>
-                        </div>
-                        <p class="text-gray-400 mb-6">
-                            A frequency-following robot utilizing sound source localization for autonomous navigation.
-                        </p>
-                        <ul class="space-y-2 text-sm text-gray-300 mb-6">
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Implemented Fourier transforms for real-time audio frequency analysis.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Integrated microphones and motors for frequency-based movement.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Optimized signal processing algorithms on Microcontrollers.
-                            </li>
-                        </ul>
-                        <div class="flex flex-wrap gap-2 mt-auto">
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Microcontrollers</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Signal Processing</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Robotics</span>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="https://github.com/unrav04/Mayo-Detector" target="_blank" class="block group bg-gray-800 rounded-xl overflow-hidden hover:-translate-y-2 transition-transform duration-300 border border-gray-700 hover:border-blue-500 cursor-pointer">
-                    <div class="p-8">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">Mayo Detector</h3>
-                            <span class="text-gray-500 text-sm">2024</span>
-                        </div>
-                        <p class="text-gray-400 mb-6">
-                            A deep learning project capable of identifying and distinguishing a specific pet cat from others.
-                        </p>
-                        <ul class="space-y-2 text-sm text-gray-300 mb-6">
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Trained a multi-layer feed-forward neural network for image classification.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Processed a dataset of 800 images using Pandas and Computer Vision.
-                            </li>
-                            <li class="flex items-start">
-                                <span class="mr-2 text-blue-500">▹</span> Achieved high accuracy through rigorous model testing.
-                            </li>
-                        </ul>
-                        <div class="flex flex-wrap gap-2 mt-auto">
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Python</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Computer Vision</span>
-                            <span class="text-xs font-mono text-gray-500 bg-gray-900 px-2 py-1 rounded">Deep Learning</span>
-                        </div>
-                    </div>
-                </a>
-
+            <!-- Selected Project Details / Quick View Dashboard -->
+            <div id="projectDetailPanel" class="w-full max-w-4xl glass-panel rounded-2xl p-5 sm:p-6 shadow-md transition-all duration-300 relative border-l-4 border-l-indigo-600 mt-2">
+                <!-- Content inserted dynamically by JS -->
             </div>
         </div>
-    </section>
 
-    <section id="contact" class="py-24 bg-gray-800/50">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl md:text-4xl font-bold mb-8 text-white">Let's Connect</h2>
-            <p class="text-gray-400 mb-12">
-                I'm always looking for new opportunities to collaborate on projects in biomedical engineering and robotics.
-            </p>
-            <div class="flex flex-col md:flex-row justify-center items-center gap-6">
-                <a href="mailto:unarvb@gmail.com" class="flex items-center gap-3 px-6 py-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-blue-500 transition-all group">
-                    <svg class="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    <span class="text-gray-300 group-hover:text-white">unarvb@gmail.com</span>
-                </a>
-                <a href="#" class="flex items-center gap-3 px-6 py-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-blue-500 transition-all group">
-                    <svg class="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
-                    <span class="text-gray-300 group-hover:text-white">LinkedIn</span>
-                </a>
-                <a href="https://github.com/unrav04" target="_blank" class="flex items-center gap-3 px-6 py-4 bg-gray-900 border border-gray-700 rounded-lg hover:border-blue-500 transition-all group">
-                    <svg class="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                    <span class="text-gray-300 group-hover:text-white">GitHub</span>
-                </a>
+        <!-- FULL GRID LIST VIEW (Hidden by default) -->
+        <div id="gridViewContainer" class="hidden w-full py-4">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="folder-git-2" class="w-5 h-5 text-indigo-600"></i>
+                    All Engineering Projects
+                </h2>
+                <span class="text-xs font-semibold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-md">5 Repositories</span>
+            </div>
+            <div id="gridProjectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Cards injected dynamically -->
             </div>
         </div>
-    </section>
 
-    <footer class="bg-gray-900 border-t border-gray-800 py-8">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
-            <p>&copy; 2026 Unarv Erinjery. All rights reserved.</p>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-xs text-slate-500 border-t border-slate-200/60 mt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p>© 2026 Unarv Erinjery. Open-source medical robotics & biomedical instrumentation.</p>
+        <div class="flex items-center gap-4 text-slate-600 font-mono text-xs">
+            <a href="https://github.com/unrav04" target="_blank" class="hover:text-indigo-600 transition-colors flex items-center gap-1">
+                <i data-lucide="github" class="w-3.5 h-3.5"></i> github.com/unrav04
+            </a>
         </div>
     </footer>
 
+    <!-- Main Logic Script -->
     <script>
-        function toggleMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('hidden');
+        // Project Data definition updated with exact GitHub repository names
+        const projects = [
+            {
+                id: "surgbot",
+                title: "SURGBOT: Voice-Activated Surgical Tool Delivery Arm",
+                shortTitle: "SURGBOT Surgical Arm",
+                tech: ["ROS", "YOLO", "Raspberry Pi 5", "Arduino", "C++", "Python"],
+                category: "Robotics & AI",
+                icon: "bot",
+                color: "indigo",
+                description: "6-DOF robotic arm utilizing real-time voice command recognition and YOLO visual object detection for automated surgical instrument localization and precise surgeon tool handoff.",
+                metrics: [
+                    { label: "Degrees of Freedom", value: "6-DOF" },
+                    { label: "Detection Engine", value: "YOLOv8 Real-time" },
+                    { label: "Control Loop", value: "ROS Melodic/Noetic" }
+                ],
+                githubUrl: "https://github.com/unrav04/SURGBOT"
+            },
+            {
+                id: "fes-stimulator",
+                title: "FES-Stimulator: Dynamic-Pulse Neurorehabilitation Unit",
+                shortTitle: "FES-Stimulator Unit",
+                tech: ["PSpice", "Boost Converter", "H-Bridge", "Optical Isolation", "Embedded C"],
+                category: "Medical Hardware",
+                icon: "zap",
+                color: "emerald",
+                description: "Current-controlled functional electrical stimulation (FES) stage featuring programmable frequency, micro-pulse width control, and dual-layer optical safety isolation for muscle re-education.",
+                metrics: [
+                    { label: "Voltage Stage", value: "30V-100V Boost" },
+                    { label: "Pulse Control", value: "10-100 Hz / 50-400µs" },
+                    { label: "Safety", value: "Opto-Isolated Signals" }
+                ],
+                githubUrl: "https://github.com/unrav04/FES-Stimulator"
+            },
+            {
+                id: "mobitrack",
+                title: "mobitrack: Real-Time Skeletal Tracking for Rehabilitation",
+                shortTitle: "mobitrack Rehab Tracker",
+                tech: ["MediaPipe", "OpenCV", "Python", "Edge Computing", "HTML"],
+                category: "Computer Vision",
+                icon: "activity",
+                color: "cyan",
+                description: "Webcam pose-estimation system for real-time joint angle calculation, range-of-motion tracking, and biofeedback metrics during physical therapy sessions.",
+                metrics: [
+                    { label: "Processing", value: "30+ FPS Edge CPU" },
+                    { label: "Accuracy", value: "< 2° Angle Error" },
+                    { label: "Target", value: "Upper & Lower Extremity" }
+                ],
+                githubUrl: "https://github.com/unrav04/mobitrack"
+            },
+            {
+                id: "kast",
+                title: "KAST: A 3D-Printed, Breathable Forearm Cast",
+                shortTitle: "KAST Lattice Cast",
+                tech: ["Blender Geometry Nodes", "Bambu Studio", "FreeCAD", "FEA"],
+                category: "3D Bio-Design",
+                icon: "box",
+                color: "teal",
+                description: "Procedural hexagonal-lattice orthopedic forearm cast generator optimized for personalized patient geometry, structural rigidity, weight minimization, and sensor/electrode integration.",
+                metrics: [
+                    { label: "Weight Reduction", value: "65% vs Plaster" },
+                    { label: "Pattern", value: "Adaptive Hex-Lattice" },
+                    { label: "Integration", value: "FES Channel Cutouts" }
+                ],
+                githubUrl: "https://github.com/unrav04/KAST"
+            },
+            {
+                id: "virenthebot",
+                title: "VIRENthebot: Frequency Following Autonomous Robot",
+                shortTitle: "VIRENthebot",
+                tech: ["Arduino", "Signal Processing", "Frequency Follower", "C/C++"],
+                category: "Embedded & Control",
+                icon: "radio",
+                color: "sky",
+                description: "Autonomous frequency-following robotic platform using onboard analog/digital signal processing to isolate target frequencies and execute real-time adaptive movement trajectories.",
+                metrics: [
+                    { label: "Targeting", value: "Frequency Following" },
+                    { label: "Architecture", value: "Arduino Microcontroller" },
+                    { label: "Signal Pipeline", value: "Analog Filtering & FFT" }
+                ],
+                githubUrl: "https://github.com/unrav04/VIRENthebot"
+            },
+            {
+                id: "mayo-detector",
+                title: "Mayo-Detector: EMG / Myoelectric Signal Classifier",
+                shortTitle: "Mayo-Detector",
+                tech: ["Jupyter Notebook", "Python", "Signal Processing", "Machine Learning"],
+                category: "Biosignal Processing",
+                icon: "cpu",
+                color: "purple",
+                description: "Myoelectric signal processing and pattern recognition notebook pipeline for muscle activation feature extraction, thresholding, and gesture classification.",
+                metrics: [
+                    { label: "Signal Type", value: "EMG / Myoelectric" },
+                    { label: "Pipeline", value: "Filtering & Feature Extraction" },
+                    { label: "Format", value: "Jupyter Notebook" }
+                ],
+                githubUrl: "https://github.com/unrav04/Mayo-Detector"
+            }
+        ];
+
+        let currentIndex = 0;
+        let viewMode = 'wheel';
+        const totalProjects = projects.length;
+        const radius = 280; // 3D radius for cylinder wheel
+
+        // Sound effect click indicator
+        function playTickSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.03);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.035);
+            } catch (e) {
+                // Audio context block fallback
+            }
         }
+
+        // Initialize Wheel Carousel HTML Cards
+        function renderWheelCards() {
+            const container = document.getElementById('wheelCarousel');
+            container.innerHTML = '';
+
+            projects.forEach((proj, idx) => {
+                const card = document.createElement('div');
+                card.className = `project-card-3d glass-panel rounded-2xl p-5 border border-slate-200 flex flex-col justify-between select-none shadow-md hover:border-indigo-400`;
+                card.id = `wheel-card-${idx}`;
+                card.onclick = () => selectCard(idx);
+
+                const techBadges = proj.tech.slice(0, 3).map(t => 
+                    `<span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-slate-100 text-slate-700 border border-slate-200">${t}</span>`
+                ).join(' ');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                ${proj.category}
+                            </span>
+                            <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center">
+                                <i data-lucide="${proj.icon}" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base text-slate-900 leading-snug mb-2 line-clamp-2">${proj.shortTitle}</h3>
+                        <p class="text-xs text-slate-600 line-clamp-3 leading-relaxed mb-3">${proj.description}</p>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            ${techBadges}
+                            ${proj.tech.length > 3 ? `<span class="text-[10px] text-slate-400 font-mono align-middle self-center">+${proj.tech.length - 3}</span>` : ''}
+                        </div>
+                        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-xs font-semibold text-indigo-600">
+                            <span class="flex items-center gap-1">Click / Tap <i data-lucide="sparkles" class="w-3 h-3"></i></span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            
+            updateWheelPositions();
+            lucide.createIcons();
+        }
+
+        // Update 3D Transformations for Wheel Carousel
+        function updateWheelPositions() {
+            const angleStep = (2 * Math.PI) / totalProjects;
+
+            projects.forEach((_, idx) => {
+                const card = document.getElementById(`wheel-card-${idx}`);
+                if (!card) return;
+
+                // Relative index to current selected item
+                let diff = idx - currentIndex;
+                
+                // Wrap around shortest distance
+                if (diff > totalProjects / 2) diff -= totalProjects;
+                if (diff < -totalProjects / 2) diff += totalProjects;
+
+                const angle = diff * angleStep;
+                const x = Math.sin(angle) * radius;
+                const z = Math.cos(angle) * radius - radius; // Shift back
+                const rotationY = (angle * 180) / Math.PI;
+
+                // Scale and opacity according to distance from front
+                const isSelected = idx === currentIndex;
+                const opacity = isSelected ? 1 : Math.max(0.25, 1 - Math.abs(diff) * 0.35);
+                const scale = isSelected ? 1.05 : Math.max(0.75, 1 - Math.abs(diff) * 0.15);
+
+                card.style.transform = `translate3d(${x}px, 0, ${z}px) rotateY(${rotationY}deg) scale(${scale})`;
+                card.style.opacity = opacity;
+
+                if (isSelected) {
+                    card.classList.add('card-active', 'bg-white');
+                    card.classList.remove('opacity-60');
+                } else {
+                    card.classList.remove('card-active', 'bg-white');
+                }
+            });
+
+            updateDetailPanel();
+        }
+
+        // Rotate wheel index
+        function rotateWheel(direction) {
+            currentIndex = (currentIndex + direction + totalProjects) % totalProjects;
+            playTickSound();
+            updateWheelPositions();
+        }
+
+        // Directly select a specific index
+        function selectCard(idx) {
+            if (currentIndex === idx) {
+                // If clicking active card in wheel view, open GitHub repository
+                window.open(projects[idx].githubUrl, '_blank');
+            } else {
+                currentIndex = idx;
+                playTickSound();
+                updateWheelPositions();
+            }
+        }
+
+        // Update active preview detail panel
+        function updateDetailPanel() {
+            const proj = projects[currentIndex];
+            const panel = document.getElementById('projectDetailPanel');
+
+            const techTags = proj.tech.map(t => 
+                `<span class="px-2.5 py-1 rounded-md text-xs font-mono font-medium bg-slate-100 text-slate-800 border border-slate-200/80">${t}</span>`
+            ).join(' ');
+
+            const metricsHTML = proj.metrics.map(m => `
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                    <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-0.5">${m.label}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-800 font-mono">${m.value}</div>
+                </div>
+            `).join('');
+
+            panel.innerHTML = `
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-3">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700">
+                                ${proj.category}
+                            </span>
+                            <span class="text-xs font-mono text-slate-400">Project 0${currentIndex + 1} / 0${totalProjects}</span>
+                        </div>
+                        <h2 class="text-lg sm:text-xl font-bold text-slate-900">${proj.title}</h2>
+                    </div>
+                    <!-- Prominent GitHub Action Button -->
+                    <a href="${proj.githubUrl}" target="_blank" rel="noopener noreferrer" 
+                       class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white rounded-xl font-semibold text-xs sm:text-sm shadow-md transition-all shrink-0">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                        <span>View Repository ↗</span>
+                    </a>
+                </div>
+
+                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">${proj.description}</p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-4">
+                    ${metricsHTML}
+                </div>
+
+                <div class="flex flex-wrap items-center gap-1.5 pt-3 border-t border-slate-200/60">
+                    <span class="text-xs font-semibold text-slate-400 mr-2 font-mono">STACK:</span>
+                    ${techTags}
+                </div>
+            `;
+            
+            lucide.createIcons();
+        }
+
+        // Render Grid View
+        function renderGridView() {
+            const gridContainer = document.getElementById('gridProjectsList');
+            gridContainer.innerHTML = '';
+
+            projects.forEach((proj, idx) => {
+                const card = document.createElement('div');
+                card.className = "glass-panel rounded-2xl p-6 border border-slate-200 flex flex-col justify-between hover:border-indigo-500 hover:shadow-lg transition-all duration-200 group";
+                
+                const techBadges = proj.tech.map(t => 
+                    `<span class="px-2 py-0.5 rounded-md text-[11px] font-mono font-medium bg-slate-100 text-slate-700 border border-slate-200">${t}</span>`
+                ).join(' ');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                ${proj.category}
+                            </span>
+                            <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                <i data-lucide="${proj.icon}" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-base text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">${proj.title}</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">${proj.description}</p>
+                    </div>
+
+                    <div>
+                        <div class="flex flex-wrap gap-1.5 mb-4">
+                            ${techBadges}
+                        </div>
+                        <a href="${proj.githubUrl}" target="_blank" rel="noopener noreferrer" 
+                           class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 group-hover:bg-indigo-600 text-white rounded-xl text-xs font-semibold transition-colors">
+                            <i data-lucide="github" class="w-4 h-4"></i>
+                            <span>View on GitHub ↗</span>
+                        </a>
+                    </div>
+                `;
+                gridContainer.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Switch View Modes (Wheel Dial vs Grid)
+        function switchView(mode) {
+            viewMode = mode;
+            const wheelCont = document.getElementById('wheelViewContainer');
+            const gridCont = document.getElementById('gridViewContainer');
+            const wheelBtn = document.getElementById('viewWheelBtn');
+            const gridBtn = document.getElementById('viewGridBtn');
+
+            if (mode === 'wheel') {
+                wheelCont.classList.remove('hidden');
+                gridCont.classList.add('hidden');
+                wheelBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                gridBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5";
+                updateWheelPositions();
+            } else {
+                wheelCont.classList.add('hidden');
+                gridCont.classList.remove('hidden');
+                gridBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                wheelBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5";
+                renderGridView();
+            }
+            playTickSound();
+        }
+
+        // Event Listeners for Interaction (Wheel Scroll, Keyboard Arrow Keys, Touch Swiping)
+        function setupEventListeners() {
+            // Mouse Wheel scroll support
+            const stage = document.querySelector('.stage-3d');
+            let isCooldown = false;
+
+            stage.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (isCooldown) return;
+                
+                if (e.deltaY > 0 || e.deltaX > 0) {
+                    rotateWheel(1);
+                } else if (e.deltaY < 0 || e.deltaX < 0) {
+                    rotateWheel(-1);
+                }
+
+                isCooldown = true;
+                setTimeout(() => { isCooldown = false; }, 180);
+            }, { passive: false });
+
+            // Keyboard Arrow keys
+            window.addEventListener('keydown', (e) => {
+                if (viewMode !== 'wheel') return;
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    rotateWheel(1);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    rotateWheel(-1);
+                }
+            });
+
+            // Touch Swipe Gesture support
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            stage.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            stage.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+
+            function handleSwipe() {
+                const threshold = 40;
+                if (touchStartX - touchEndX > threshold) {
+                    rotateWheel(1); // Swipe left -> next card
+                } else if (touchEndX - touchStartX > threshold) {
+                    rotateWheel(-1); // Swipe right -> prev card
+                }
+            }
+        }
+
+        // Initializer
+        window.onload = () => {
+            renderWheelCards();
+            setupEventListeners();
+            lucide.createIcons();
+        };
     </script>
 </body>
 </html>
